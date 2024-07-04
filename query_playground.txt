@@ -1,0 +1,19 @@
+CREATE (u:TUser {uuid:'1'})
+CREATE (p:Content:TPost {uuid:'2'})
+CREATE (v:Content:TVideo {uuid: '3'})
+CREATE (p1:Content:TPost {uuid:'4'})
+WITH u,p,v
+MERGE (u) - [:LIKED_POST] -> (p)
+MERGE (u) - [:LIKED_VIDEO] -> (v)
+
+MATCH (c:Content)
+MATCH (u:TUser {uuid:'1'})
+RETURN c,
+    CASE LABELS(c)[0]
+        WHEN 'TPost'
+            THEN exists((u) - [:LIKED_POST] -> (c))
+        WHEN 'TVideo'
+            THEN exists((u) - [:LIKED_VIDEO] -> (c))
+    END AS IS_LIKED
+
+    
